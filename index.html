@@ -1,28 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>Flashlight</title>
+
+    <!-- Recommended meta tags -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Green Hills with Water Stream</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <!-- PyScript CSS -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
+
+    <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            height: 100vh;
             margin: 0;
-            background-color: #87CEEB; /* Sky blue background */
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
         }
-        canvas {
+        #myCanvas {
             border: 1px solid black;
+            position: relative;
+        }
+        #canvasContainer {
+            position: relative;
+            width: 700px;
+            height: 700px;
+        }
+        .movingDiv {
+            width: 70px;
+            height: 70px;
+            background-color: red;
+            position: absolute;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        #movingDiv1 {
+            background-color: blue;
+        }
+        #movingDiv2 {
+            background-color: green;
+        }
+        #movingDiv3 {
+            background-color: red;
         }
     </style>
 </head>
 <body>
-    <canvas id="hillCanvas" width="800" height="600"></canvas>
+    <div id="canvasContainer">
+        <p id="item">1</p>
+        <canvas id="myCanvas" width="700" height="700"></canvas>
+        <button id="movingDiv1" class="movingDiv"></button>
+        <button id="movingDiv2" class="movingDiv"></button>
+        <button id="movingDiv3" class="movingDiv"></button>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <source src="download.mp4" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script type="py">
+        from pyscript import when, document
+
+        @when("click", "#movingDiv1")
+        def fun1(event):
+            q = document.querySelector("#item")
+            q.innerText = (int(q.innerText)) + 1
+
+        @when("click", "#movingDiv2")
+        def fun2(event):
+            q = document.querySelector("#item")
+            q.innerText = (int(q.innerText)) + 1
+
+        @when("click", "#movingDiv3")
+        def fun3(event):
+            q = document.querySelector("#item")
+            q.innerText = (int(q.innerText)) + 1
+    </script>
 
     <script>
-        const canvas = document.getElementById('hillCanvas');
+        const canvas = document.getElementById('myCanvas');
+        const movingDiv1 = document.getElementById('movingDiv1');
+        const movingDiv2 = document.getElementById('movingDiv2');
+        const movingDiv3 = document.getElementById('movingDiv3');
+        const canvasRect = canvas.getBoundingClientRect();
+
+        function getRandomPosition() {
+            const x = Math.random() * (canvas.width - 70); // 100 is the width of the div
+            const y = Math.random() * (canvas.height - 70); // 100 is the height of the div
+            return { x, y };
+        }
+
+       function moveDiv(div) {
+             const { x, y } = getRandomPosition(); 
+             const angle = Math.random() * 360;
+             div.style.left = `${canvasRect.left + x}px`;
+             div.style.top = `${canvasRect.top + y}px`;
+             div.style.transform = 'translate(${x}px, ${y}px';
+             div.style.transform = 'rotate(${angle}deg';
+        }
+
+        function startMoving() {
+            moveDiv(movingDiv1);
+            moveDiv(movingDiv2);
+            moveDiv(movingDiv3);
+            const moveInterval1 = setInterval(() => moveDiv(movingDiv1), 5000);
+            const moveInterval2 = setInterval(() => moveDiv(movingDiv2), 5000);
+            const moveInterval3 = setInterval(() => moveDiv(movingDiv3), 5000);
+
+            setTimeout(() => {
+                clearInterval(moveInterval1);
+                clearInterval(moveInterval2);
+                clearInterval(moveInterval3);
+                movingDiv1.style.display = 'none';
+                movingDiv2.style.display = 'none';
+                movingDiv3.style.display = 'none';
+            }, 20000);
+        }
+
+        startMoving();
+        document.getElementById("backgroundMusic").play();
         const ctx = canvas.getContext('2d');
 
         // Function to draw a single hill
